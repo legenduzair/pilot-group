@@ -44,7 +44,7 @@ app.get('/iss-tracker', async (req, res) => {
       res.status(200).json({
         distanceInMiles: `The ISS is currently ${distanceInMiles} miles away from The Pilot Group HQ.`,
         country: country ? `The ISS is currently over ${country.formatted_address}` : 'The ISS is currently not over a country.',
-        message: 'Successfully acquired country and distance in miles'
+        message: 'Successfully acquired ISS location and distance in miles'
       });
     } catch (error) {
       console.log(error);
