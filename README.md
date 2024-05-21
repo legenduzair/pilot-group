@@ -22,6 +22,7 @@ If i was to improve this application I would:
 3. Possible, containerise the application using Docker so that it can used and deployed easily. 
 4. Maybe instead of using console.log, use VS Code debugger for more efficient debugging.
 5. Implement rate limiting so the API endpoint does not get abused. 
+6. Potentially implement better error handling within the API endpoint so if the variables are null or undefined, then return a console warning. 
 
 ## Optional Extras
 
