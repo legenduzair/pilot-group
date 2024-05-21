@@ -10,7 +10,6 @@ const app = express();
 const PORT = 5000;
 
 const issLocatorApi = 'http://api.open-notify.org/iss-now.json';
-const reverseGeoApi = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=50.8028,-121.0255&key=AIzaSyDIExpGgbAfyoce9lzBp1kFoxOmhgmmTEI';
 
 const targetAddressCoordinates = {
     latitude: 53.4912462, 
@@ -26,17 +25,27 @@ app.use(cors());
 
 app.get('/iss-tracker', async (req, res) => {
     try {
-      const issApi = await axios.get(issLocatorApi);
-      const issPosition = issApi.data.iss_position;
+      const issApiResponse = await axios.get(issLocatorApi);
+      const issPosition = issApiResponse.data.iss_position;
       console.log(issPosition);
       
       const distance = geolib.getPreciseDistance(targetAddressCoordinates, issPosition);
       console.log(distance);
 
-      const distanceInMiles = geolib.convertDistance(distance, 'mi');
+      const distanceInMiles = Math.round(geolib.convertDistance(distance, 'mi'));
       console.log(distanceInMiles);
 
-      res.status(200).json({message: 'Success'});
+      const reverseGeoApiResponse = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${issPosition.latitude},${issPosition.longitude}&key=AIzaSyDIExpGgbAfyoce9lzBp1kFoxOmhgmmTEI`);
+      const results = reverseGeoApiResponse.data.results;
+
+      const country = results.find(r => r.types.includes('country'));
+      console.log(country);
+
+      res.status(200).json({
+        distanceInMiles: `The ISS is currently ${distanceInMiles} miles away from The Pilot Group HQ.`,
+        country: country ? `The ISS is currently over ${country.formatted_address}` : 'The ISS is currently not over a country.',
+        message: 'Successfully acquired country and distance in miles'
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Unable to fetch information on the ISS tracker."});
